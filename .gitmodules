@@ -1,0 +1,3 @@
+[submodule "home-server-priv"]
+	path = home-server-priv
+	url = git@github.com:ryangay/home-server-priv.git
