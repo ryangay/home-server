@@ -1,0 +1,5 @@
+---
+- name: Run Docker install
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_facts['pkg_mgr'] }}.yaml"

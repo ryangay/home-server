@@ -1,0 +1,24 @@
+---
+- hosts: frigate
+  roles:
+    - docker
+  vars_files:
+    - ../../home-server-priv/common.yaml
+    - ../../home-server-priv/secrets.yaml
+    - ../../home-server-priv/frigate.yaml
+
+  tasks:
+    - name: Copy Docker Compose file
+      ansible.builtin.template:
+        src: docker-compose.yaml.j2
+        dest: "{{ frigate.install_dir }}/docker-compose.yaml"
+
+    - name: Copy Frigate config
+      ansible.builtin.template:
+        src: config.yaml.j2
+        dest: "{{ frigate.install_dir }}/config/config.yaml"
+
+    - name: Start Frigate
+      community.docker.docker_compose_v2:
+        project_src: "{{ frigate.install_dir }}"
+        state: present

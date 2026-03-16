@@ -9,7 +9,7 @@ This repository contains Ansible scripts for automating the deployment of the se
 |Mosquitto|❌|❌|
 |Zigbee2MQTT|❌|❌|
 |Paperless-ngx|❌|❌|
-|Frigate|❌|❌|
+|Frigate|❌|✅|
 |Immich|❌|❌|
 |Qbittorrent|❌|❌|
 |Jellyfin|❌|❌|

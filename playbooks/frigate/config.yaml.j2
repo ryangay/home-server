@@ -1,0 +1,101 @@
+mqtt:
+  host: {{ mqtt_host }}
+  user: {{ mqtt_user }}
+  password: {{ passwords.mqtt }}
+
+go2rtc:
+  streams:
+{% for camera, params in frigate.cameras.items() %}
+    {{ camera }}:
+      - ffmpeg:http://{{ params.ip_address }}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user={{ params.username }}&password={{ passwords.cameras.get(camera) }}#video=copy#audio=copy#audio=opus
+      - rtsp://{{ params.username }}:{{ passwords.cameras.get(camera) }}@{{ params.ip_address }}/Preview_01_sub
+    {{ camera }}_sub:
+      - ffmpeg:http://{{ params.ip_address }}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user={{ params.username }}&password={{ passwords.cameras.get(camera) }}
+      - rtsp://{{ params.username }}:{{ passwords.cameras.get(camera) }}@{{ params.ip_address }}/Preview_01_sub
+{% endfor %}
+
+record:
+  enabled: true
+  alerts:
+    retain:
+      days: 30
+  detections:
+    retain:
+      days: 30
+
+  continuous:
+    days: 0
+  motion:
+    days: 7
+snapshots:
+  enabled: true
+  retain:
+    default: 30
+
+cameras:
+{% for camera, params in frigate.cameras.items() %}
+  {{ camera }}:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://{{ params.username }}:{{ passwords.cameras.get(camera) }}@{{ params.ip_address }}:554/Preview_01_main
+          roles:
+            - record
+        - path: rtsp://{{ params.username }}:{{ passwords.cameras.get(camera) }}@{{ params.ip_address }}:554/Preview_01_sub
+          roles:
+            - detect
+{% endfor %}
+
+    detect:
+      enabled: true
+      width: 2560
+      height: 1920
+
+    motion:
+      mask:
+        - 0.344,0.009,0.345,0.059,0.66,0.056,0.661,0.007
+        - 0.007,0.012,0.007,0.057,0.12,0.057,0.12,0.012
+        - 0.548,0.264,0.555,0.53,0.641,0.53,0.653,0.449,0.648,0.367,0.604,0.27
+        - 0.577,0.009,0.575,0.266,0.993,0.176,0.991,0.01
+        - 0.843,0.342,0.952,0.344,0.934,0.232,0.849,0.248
+        - 0.938,0.536,0.938,0.512,0.861,0.505,0.86,0.524
+    objects:
+      filters:
+        person: {}
+    zones:
+      porch:
+        coordinates:
+          0.012,0.977,0.011,0.029,0.57,0.023,0.568,0.131,0.577,0.191,0.577,0.222,0.581,0.26,0.6,0.311,0.624,0.347,0.652,0.49,0.66,0.57,0.674,0.624,0.706,0.718,0.752,0.775,0.787,0.838,0.836,0.912,0.854,0.957
+        loitering_time: 3
+      drive:
+        coordinates: 0.552,0.678,0.856,0.963,0.978,0.645,0.847,0.607
+        loitering_time: 2
+        inertia: 3
+    review:
+      alerts:
+        required_zones:
+          - porch
+          - drive
+      detections:
+        required_zones:
+          - porch
+          - drive
+tls:
+  enabled: false
+detect:
+  enabled: true
+version: 0.17-0
+
+#auth:
+#  reset_admin_password: true
+semantic_search:
+  enabled: true
+  model_size: large
+face_recognition:
+  enabled: true
+  model_size: large
+lpr:
+  enabled: true
+classification:
+  bird:
+    enabled: false
