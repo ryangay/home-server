@@ -1,0 +1,34 @@
+---
+- hosts: immich
+  roles:
+    - docker
+  vars_files:
+    - ../../home-server-priv/common.yaml
+    - ../../home-server-priv/secrets.yaml
+    - ../../home-server-priv/immich.yaml
+
+  tasks:
+    - name: Ensure install directory exists
+      ansible.builtin.file:
+        path: "{{ immich.install_dir}}"
+        state: directory
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: docker-compose.yml
+        dest: "{{ immich.install_dir }}/docker-compose.yml"
+
+    - name: Copy hwaccel config file
+      ansible.builtin.copy:
+        src: hwaccel.transcoding.yml
+        dest: "{{ immich.install_dir }}/hwaccel.transcoding.yml"
+
+    - name: Copy Immich .env file
+      ansible.builtin.template:
+        src: .env.j2
+        dest: "{{ immich.install_dir }}/.env"
+
+    - name: Start Immich
+      community.docker.docker_compose_v2:
+        project_src: "{{ immich.install_dir }}"
+        state: present
