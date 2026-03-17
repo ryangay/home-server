@@ -1,7 +1,7 @@
 ---
 - name: Install Docker from apk
   community.general.apk:
-    name: docker, docker-cli-compose
+    name: docker,docker-cli-compose
     state: present
   become: true
 
