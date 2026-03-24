@@ -10,7 +10,7 @@ This repository contains Ansible scripts for automating the deployment of the se
 |Zigbee2MQTT|❌|❌|
 |Paperless-ngx|❌|❌|
 |Frigate|❌|✅|
-|Immich|❌|❌|
+|Immich|❌|✅|
 |Qbittorrent|❌|❌|
 |Jellyfin|❌|❌|
 |Gitea|❌|❌|
